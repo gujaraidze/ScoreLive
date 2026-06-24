@@ -13,7 +13,6 @@ class AuthInterceptor : Interceptor {
 
     companion object {
         private const val API_KEY = "YOUR_API_KEY_HERE"
-//
-//
+
     }
 }
