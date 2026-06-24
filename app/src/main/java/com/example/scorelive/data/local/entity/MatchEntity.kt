@@ -23,6 +23,7 @@ data class MatchEntity(
     val leagueName: String,
     val leagueLogo: String,
     val leagueCountry: String,
+    val leagueSeason: Int?,
     val status: String,
     val minute: Int?,
     val date: String,
@@ -49,7 +50,8 @@ fun MatchEntity.toMatch(): Match {
             id = leagueId,
             name = leagueName,
             logoUrl = leagueLogo,
-            country = leagueCountry
+            country = leagueCountry,
+            season = leagueSeason
         ),
         status = MatchStatus.fromString(status),
         minute = minute,

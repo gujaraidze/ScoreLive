@@ -22,9 +22,19 @@ interface MatchDao {
     @Query("SELECT * FROM matches WHERE leagueId = :leagueId ORDER BY date ASC")
     fun getMatchesByLeague(leagueId: Int): Flow<List<MatchEntity>>
 
+    @Query("SELECT * FROM matches WHERE date LIKE :datePrefix || '%' ORDER BY date ASC")
+    fun getMatchesByDate(datePrefix: String): Flow<List<MatchEntity>>
+
     @Query("SELECT * FROM matches WHERE id = :matchId")
     fun getMatchById(matchId: Int): Flow<MatchEntity?>
 
-    @Query("DELETE FROM matches WHERE isLive = 0")
-    suspend fun deleteNonLiveMatches()
+    @Query("SELECT DISTINCT leagueId, leagueName, leagueLogo, leagueCountry FROM matches ORDER BY leagueName ASC")
+    fun getDistinctLeagues(): Flow<List<LeagueRow>>
+
+    data class LeagueRow(
+        val leagueId: Int,
+        val leagueName: String,
+        val leagueLogo: String,
+        val leagueCountry: String
+    )
 }

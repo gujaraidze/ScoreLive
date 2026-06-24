@@ -19,6 +19,7 @@ fun FixtureResponseItemDto.toEntity(): MatchEntity {
         leagueName = league.name,
         leagueLogo = league.logo,
         leagueCountry = league.country,
+        leagueSeason = league.season,
         status = fixture.status.short,
         minute = fixture.status.elapsed,
         date = fixture.date,

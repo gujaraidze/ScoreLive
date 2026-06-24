@@ -44,7 +44,9 @@ data class LeagueDto(
     @SerializedName("logo")
     val logo: String,
     @SerializedName("country")
-    val country: String
+    val country: String,
+    @SerializedName("season")
+    val season: Int? = null
 )
 
 data class TeamsDto(

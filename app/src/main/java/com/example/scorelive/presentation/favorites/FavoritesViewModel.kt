@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 sealed class FavoritesUiState {
@@ -33,16 +34,24 @@ class FavoritesViewModel(application: Application) : AndroidViewModel(applicatio
     val event = _event.asSharedFlow()
 
     init {
-        observeLiveMatches()
+        observeFavorites()
     }
 
-    private fun observeLiveMatches() {
+    private fun observeFavorites() {
         viewModelScope.launch {
-            repository.getLiveMatchesFromDb().collect { matches ->
-                _uiState.value = if (matches.isEmpty()) {
+            // combine merges two flows into one
+            // whenever favorites list OR matches list changes — UI updates
+            combine(
+                repository.getFavoriteIds(),
+                repository.getTodayMatchesFromDb()
+            ) { favoriteIds: List<Int>, allMatches: List<Match> ->
+                // filter matches to only show favorited ones
+                allMatches.filter { match -> match.id in favoriteIds }
+            }.collect { favoriteMatches: List<Match> ->
+                _uiState.value = if (favoriteMatches.isEmpty()) {
                     FavoritesUiState.Empty
                 } else {
-                    FavoritesUiState.Success(matches)
+                    FavoritesUiState.Success(favoriteMatches)
                 }
             }
         }
@@ -51,6 +60,12 @@ class FavoritesViewModel(application: Application) : AndroidViewModel(applicatio
     fun onMatchClicked(matchId: Int) {
         viewModelScope.launch {
             _event.emit(FavoritesEvent.NavigateToDetail(matchId))
+        }
+    }
+
+    fun removeFavorite(matchId: Int) {
+        viewModelScope.launch {
+            repository.removeFavorite(matchId)
         }
     }
 }

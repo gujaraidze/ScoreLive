@@ -10,11 +10,11 @@ enum class MatchStatus {
     companion object {
         fun fromString(status: String): MatchStatus {
             return when (status) {
-                "1H", "2H", "HT", "ET", "BT", "P", "INT" -> LIVE
+                "1H", "2H", "HT", "ET", "BT", "P", "INT", "LIVE" -> LIVE
                 "FT", "AET", "PEN" -> FINISHED
-                "NS" -> SCHEDULED
+                "NS", "TBD" -> SCHEDULED
                 "PST" -> POSTPONED
-                "CANC", "ABD" -> CANCELLED
+                "CANC", "ABD", "AWD", "WO", "SUSP" -> CANCELLED
                 else -> SCHEDULED
             }
         }

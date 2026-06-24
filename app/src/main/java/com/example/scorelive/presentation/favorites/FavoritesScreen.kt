@@ -37,7 +37,7 @@ fun FavoritesScreen(
             .background(BackgroundDark)
     ) {
         Text(
-            text = "Live Matches",
+            text = "Favorites",
             color = TextPrimary,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
