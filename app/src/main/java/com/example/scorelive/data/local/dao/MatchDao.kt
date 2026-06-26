@@ -16,9 +16,6 @@ interface MatchDao {
     @Query("SELECT * FROM matches ORDER BY date ASC")
     fun getAllMatches(): Flow<List<MatchEntity>>
 
-    @Query("SELECT * FROM matches WHERE isLive = 1")
-    fun getLiveMatches(): Flow<List<MatchEntity>>
-
     @Query("SELECT * FROM matches WHERE leagueId = :leagueId ORDER BY date ASC")
     fun getMatchesByLeague(leagueId: Int): Flow<List<MatchEntity>>
 

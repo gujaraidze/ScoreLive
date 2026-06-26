@@ -10,14 +10,12 @@ interface FootballRepository {
     fun getMatchesByLeagueFromDb(leagueId: Int): Flow<List<Match>>
 
     // DB reads
-    fun getLiveMatchesFromDb(): Flow<List<Match>>
     fun getTodayMatchesFromDb(): Flow<List<Match>>
     fun getMatchByIdFromDb(matchId: Int): Flow<Match?>
     fun getMatchesByDateFromDb(date: String): Flow<List<Match>>
 
     // API → Room
     suspend fun fetchLiveMatches(): NetworkResult<Unit>
-    suspend fun fetchTodayMatches(date: String): NetworkResult<Unit>
     suspend fun fetchMatchesByDate(date: String): NetworkResult<Unit>
 
     // match detail (not cached)
@@ -35,9 +33,6 @@ interface FootballRepository {
 
     // competition detail
     suspend fun fetchLeagueSeason(leagueId: Int): NetworkResult<Int>
-    suspend fun fetchLeagueFixtures(leagueId: Int, season: Int): NetworkResult<List<Match>>
-    suspend fun fetchTopScorers(leagueId: Int, season: Int): NetworkResult<List<TopPlayer>>
-    suspend fun fetchTopAssists(leagueId: Int, season: Int): NetworkResult<List<TopPlayer>>
 
     // search
     suspend fun searchTeams(query: String): NetworkResult<List<Team>>

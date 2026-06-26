@@ -113,9 +113,6 @@ class MockRepository : FootballRepository {
     override fun getLeaguesFromDb(): Flow<List<League>> =
         flow { emit(listOf(premLeague, bundesliga, ucl)) }
 
-    override fun getLiveMatchesFromDb(): Flow<List<Match>> =
-        flow { emit(allMatches.filter { it.status == MatchStatus.LIVE }) }
-
     override fun getTodayMatchesFromDb(): Flow<List<Match>> =
         flow { emit(allMatches) }
 
@@ -128,7 +125,6 @@ class MockRepository : FootballRepository {
     // --- API fetches (all instant, no network) ---
 
     override suspend fun fetchLiveMatches() = NetworkResult.Success(Unit)
-    override suspend fun fetchTodayMatches(date: String) = NetworkResult.Success(Unit)
     override suspend fun fetchMatchesByDate(date: String) = NetworkResult.Success(Unit)
 
     override suspend fun fetchMatchEvents(matchId: Int) = NetworkResult.Success(
@@ -272,29 +268,6 @@ class MockRepository : FootballRepository {
     }
 
     override suspend fun fetchLeagueSeason(leagueId: Int) = NetworkResult.Success(2025)
-
-    override suspend fun fetchLeagueFixtures(leagueId: Int, season: Int) =
-        NetworkResult.Success(allMatches)
-
-    override suspend fun fetchTopScorers(leagueId: Int, season: Int) = NetworkResult.Success(
-        listOf(
-            com.example.scorelive.domain.model.TopPlayer(1, "Erling Haaland", null, "Manchester City", city.logoUrl, 34, 8),
-            com.example.scorelive.domain.model.TopPlayer(2, "Harry Kane", null, "Tottenham", spurs.logoUrl, 25, 5),
-            com.example.scorelive.domain.model.TopPlayer(3, "Marcus Rashford", null, "Manchester United", manu.logoUrl, 20, 6),
-            com.example.scorelive.domain.model.TopPlayer(4, "Mohamed Salah", null, "Liverpool", liver.logoUrl, 17, 10),
-            com.example.scorelive.domain.model.TopPlayer(5, "Bukayo Saka", null, "Arsenal", arsenal.logoUrl, 14, 11),
-        )
-    )
-
-    override suspend fun fetchTopAssists(leagueId: Int, season: Int) = NetworkResult.Success(
-        listOf(
-            com.example.scorelive.domain.model.TopPlayer(6, "Kevin De Bruyne", null, "Manchester City", city.logoUrl, 5, 16),
-            com.example.scorelive.domain.model.TopPlayer(4, "Mohamed Salah", null, "Liverpool", liver.logoUrl, 17, 10),
-            com.example.scorelive.domain.model.TopPlayer(5, "Bukayo Saka", null, "Arsenal", arsenal.logoUrl, 14, 11),
-            com.example.scorelive.domain.model.TopPlayer(7, "Bruno Fernandes", null, "Manchester United", manu.logoUrl, 8, 9),
-            com.example.scorelive.domain.model.TopPlayer(8, "Andrew Robertson", null, "Liverpool", liver.logoUrl, 1, 8),
-        )
-    )
 
     override suspend fun searchTeams(query: String) = NetworkResult.Success(
         listOf(manu, city, liver, arsenal, chelsea, spurs)

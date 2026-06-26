@@ -35,9 +35,6 @@ class FootballRepositoryImpl(
         matchDao.getMatchesByLeague(leagueId).map { it.map { e -> e.toMatch() } }
 
     // DB reads
-    override fun getLiveMatchesFromDb() =
-        matchDao.getLiveMatches().map { it.map { e -> e.toMatch() } }
-
     override fun getTodayMatchesFromDb() =
         matchDao.getAllMatches().map { it.map { e -> e.toMatch() } }
 
@@ -52,8 +49,6 @@ class FootballRepositoryImpl(
         makeApiCall { apiService.getLiveFixtures() }.mapSuccess {
             matchDao.upsertAll(it.response.map { item -> item.toEntity() })
         }
-
-    override suspend fun fetchTodayMatches(date: String) = fetchMatchesByDate(date)
 
     override suspend fun fetchMatchesByDate(date: String) =
         makeApiCall { apiService.getFixturesByDate(date) }.mapSuccess {
@@ -118,21 +113,6 @@ class FootballRepositoryImpl(
             }
         }
     }
-
-    override suspend fun fetchLeagueFixtures(leagueId: Int, season: Int) =
-        makeApiCall { apiService.getFixturesByLeague(leagueId, season) }.mapSuccess {
-            it.response.map { item -> item.toEntity().toMatch() }
-        }
-
-    override suspend fun fetchTopScorers(leagueId: Int, season: Int) =
-        makeApiCall { apiService.getTopScorers(leagueId, season) }.mapSuccess {
-            it.response.map { item -> item.toTopPlayer() }
-        }
-
-    override suspend fun fetchTopAssists(leagueId: Int, season: Int) =
-        makeApiCall { apiService.getTopAssists(leagueId, season) }.mapSuccess {
-            it.response.map { item -> item.toTopPlayer() }
-        }
 
     // search
     override suspend fun searchTeams(query: String) =

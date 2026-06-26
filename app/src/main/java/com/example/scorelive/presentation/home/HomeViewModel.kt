@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -119,6 +121,29 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val windowStart = _windowStart.value
         (0..4).forEach { i ->
             fetchMatchesForDate(windowStart.plusDays(i.toLong()))
+        }
+        startLivePolling()
+    }
+
+    // Re-fetches in-play matches on a timer so live scores tick up while the user
+    // watches, without them having to leave and re-open the screen. The TTL gate in
+    // fetchMatchesForDate only *prevents* redundant calls — it never triggers a refresh
+    // on its own. This loop is what actually pushes new data into Room, after which the
+    // existing Room Flow carries the update to the UI automatically.
+    //
+    // fetchLiveMatches() hits /fixtures?live=all (one API call) and upserts only the
+    // matches currently in play. We only poll while today is the selected date, since
+    // past/future dates have no live matches and polling them would waste API quota.
+    // viewModelScope cancels this loop automatically when the ViewModel is cleared.
+    private fun startLivePolling() {
+        viewModelScope.launch {
+            while (isActive) {
+                delay(30_000L) // 30s — frequent enough for scores, light on the free-plan quota
+                if (_selectedDate.value == LocalDate.now()) {
+                    android.util.Log.d("API_LIMIT", "Live poll — fetching in-play matches")
+                    repository.fetchLiveMatches()
+                }
+            }
         }
     }
 
