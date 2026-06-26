@@ -21,14 +21,12 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ScoreLiveTheme {
-                // navController lives here in MainActivity
-                // shared between NavGraph and BottomNavBar
+
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
-                // Scaffold provides the basic screen structure
-                // with a slot for bottom bar
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {

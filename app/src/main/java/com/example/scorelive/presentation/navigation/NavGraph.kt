@@ -46,7 +46,7 @@ data class BottomNavItem(
     val icon: ImageVector
 )
 
-// 3 bottom nav tabs: Home, Competition, Favorites (Search moved to top bar)
+// 3 bottom nav tabs: Home, Competition, Favorites
 val bottomNavItems = listOf(
     BottomNavItem(Screen.Home, "Home", Icons.Default.Home),
     BottomNavItem(Screen.Competition, "Competition", Icons.Default.SportsSoccer),

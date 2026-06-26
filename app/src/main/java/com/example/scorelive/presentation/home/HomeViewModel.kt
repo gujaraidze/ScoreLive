@@ -31,7 +31,6 @@ sealed class HomeUiState {
     data class Error(val message: String) : HomeUiState()
 }
 
-// the two tabs below the Live Now carousel
 enum class HomeTab { UPCOMING, SCORE }
 
 // one league's worth of matches, in the order leagues first appeared in the API response
@@ -73,7 +72,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _windowStart = MutableStateFlow(LocalDate.now().minusDays(2))
     val windowStart: StateFlow<LocalDate> = _windowStart.asStateFlow()
 
-    // which of the Upcoming / Score / Favorites tabs is active
+    // which of the Upcoming / Score tabs is active
     private val _selectedTab = MutableStateFlow(HomeTab.SCORE)
     val selectedTab: StateFlow<HomeTab> = _selectedTab.asStateFlow()
 

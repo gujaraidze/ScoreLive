@@ -3,7 +3,6 @@ package com.example.scorelive.data.remote.dto
 import com.example.scorelive.data.local.entity.MatchEntity
 
 // FixtureResponseItemDto → MatchEntity
-// same pattern as lecturer's toDatabase() extension function
 fun FixtureResponseItemDto.toEntity(): MatchEntity {
     return MatchEntity(
         id = fixture.id,
