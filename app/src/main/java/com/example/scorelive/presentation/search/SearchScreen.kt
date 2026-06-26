@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.example.scorelive.domain.model.Match
 import com.example.scorelive.domain.model.Team
 import com.example.scorelive.presentation.home.MatchCard
 import com.example.scorelive.presentation.theme.*
