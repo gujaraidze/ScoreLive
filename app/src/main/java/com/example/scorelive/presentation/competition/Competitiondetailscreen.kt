@@ -27,10 +27,6 @@ import com.example.scorelive.presentation.theme.*
 
 @Composable
 fun CompetitionDetailScreen(
-    leagueId: Int,
-    leagueName: String,
-    logoUrl: String,
-    country: String,
     onBackClicked: () -> Unit,
     onMatchClicked: (Int) -> Unit,
     viewModel: CompetitionDetailViewModel = viewModel()
@@ -70,7 +66,7 @@ fun CompetitionDetailScreen(
             }
         }
 
-        // league header
+        // league header — read from the ViewModel (logo is built from leagueId there)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -78,14 +74,14 @@ fun CompetitionDetailScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AsyncImage(
-                model = logoUrl,
-                contentDescription = leagueName,
+                model = viewModel.logoUrl,
+                contentDescription = viewModel.leagueName,
                 modifier = Modifier.size(52.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = country, color = TextSecondary, fontSize = 13.sp)
+            Text(text = viewModel.country, color = TextSecondary, fontSize = 13.sp)
             Text(
-                text = leagueName,
+                text = viewModel.leagueName,
                 color = TextPrimary,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold

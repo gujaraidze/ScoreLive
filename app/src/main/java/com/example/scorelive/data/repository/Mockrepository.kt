@@ -36,7 +36,7 @@ class MockRepository : FootballRepository {
     private val barcelona  = Team(529,"Barcelona",       "https://media.api-sports.io/football/teams/529.png")
 
     private val today = LocalDate.now().toString()
-    private val yesterday = LocalDate.now().minusDays(1).toString()
+
 
     // --- matches ---
 
@@ -103,7 +103,7 @@ class MockRepository : FootballRepository {
     )
 
     // favorites state so add/remove actually works in mock mode
-    private val favoriteIds = MutableStateFlow<Set<Int>>(setOf(1003))
+    private val favoriteIds = MutableStateFlow(setOf(1003))
 
     // --- DB reads ---
 

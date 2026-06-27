@@ -55,6 +55,7 @@ fun MatchEntity.toMatch(): Match {
         ),
         status = MatchStatus.fromString(status),
         minute = minute,
-        date = date
+        date = date,
+        statusShort = status
     )
 }

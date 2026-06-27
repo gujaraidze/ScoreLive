@@ -29,9 +29,9 @@ import com.example.scorelive.presentation.theme.BottomNavUnselected
 sealed class Screen(val route: String) {
     object Home : Screen("home")
     object Competition : Screen("competition")
-    object CompetitionDetail : Screen("competition_detail/{leagueId}/{leagueName}/{logoUrl}/{country}") {
-        fun createRoute(leagueId: Int, leagueName: String, logoUrl: String, country: String) =
-            "competition_detail/$leagueId/${java.net.URLEncoder.encode(leagueName, "UTF-8")}/${java.net.URLEncoder.encode(logoUrl, "UTF-8")}/${java.net.URLEncoder.encode(country, "UTF-8")}"
+    object CompetitionDetail : Screen("competition_detail/{leagueId}/{leagueName}/{country}") {
+        fun createRoute(leagueId: Int, leagueName: String, country: String) =
+            "competition_detail/$leagueId/${java.net.URLEncoder.encode(leagueName, "UTF-8")}/${java.net.URLEncoder.encode(country, "UTF-8")}"
     }
     object Search : Screen("search")
     object Favorites : Screen("favorites")
@@ -81,7 +81,6 @@ fun ScoreLiveNavGraph(
                         Screen.CompetitionDetail.createRoute(
                             leagueId = league.id,
                             leagueName = league.name,
-                            logoUrl = league.logoUrl,
                             country = league.country
                         )
                     )
@@ -94,19 +93,12 @@ fun ScoreLiveNavGraph(
             arguments = listOf(
                 androidx.navigation.navArgument("leagueId") { type = androidx.navigation.NavType.IntType },
                 androidx.navigation.navArgument("leagueName") { type = androidx.navigation.NavType.StringType },
-                androidx.navigation.navArgument("logoUrl") { type = androidx.navigation.NavType.StringType },
                 androidx.navigation.navArgument("country") { type = androidx.navigation.NavType.StringType },
             )
-        ) { backStackEntry ->
-            val leagueId = backStackEntry.arguments?.getInt("leagueId") ?: 0
-            val leagueName = java.net.URLDecoder.decode(backStackEntry.arguments?.getString("leagueName") ?: "", "UTF-8")
-            val logoUrl = java.net.URLDecoder.decode(backStackEntry.arguments?.getString("logoUrl") ?: "", "UTF-8")
-            val country = java.net.URLDecoder.decode(backStackEntry.arguments?.getString("country") ?: "", "UTF-8")
+        ) {
+            // The ViewModel reads leagueId/leagueName/country from the route and builds the
+            // logo URL from the id, so the screen needs no header parameters here.
             CompetitionDetailScreen(
-                leagueId = leagueId,
-                leagueName = leagueName,
-                logoUrl = logoUrl,
-                country = country,
                 onBackClicked = { navController.popBackStack() },
                 onMatchClicked = { matchId ->
                     navController.navigate(Screen.MatchDetail.createRoute(matchId))

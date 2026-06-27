@@ -180,24 +180,30 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 _uiState.value = if (matches.isEmpty() && currentDateStr !in fetchedDates) {
                     HomeUiState.Loading
                 } else {
-                    // live matches are always pinned at the top regardless of tab,
-                    // exactly as they are today
-                    val live = matches
-                        .filter { it.status == MatchStatus.LIVE }
-                        .sortedWith(
-                            compareBy(
-                                { LeaguePriority.rankFor(it.league.id) },
-                                { it.league.name }
-                            )
-                        )
-
-                    // compute which tabs to show:
-                    // Score: only when there are finished matches
-                    // Upcoming: only for today and future dates
                     val today = java.time.LocalDate.now()
                     val selectedDateLocal = java.time.LocalDate.parse(_selectedDate.value.toString())
                     val isPastDate = selectedDateLocal.isBefore(today)
 
+                    // Live Now only makes sense for today. A match on a past date can't be
+                    // "live now", so we never show the carousel there — this guards against
+                    // stale rows where a match was cached while live and never re-fetched to
+                    // FT, which would otherwise leave it stuck as LIVE on an old date.
+                    val live = if (selectedDateLocal == today) {
+                        matches
+                            .filter { it.status == MatchStatus.LIVE }
+                            .sortedWith(
+                                compareBy(
+                                    { LeaguePriority.rankFor(it.league.id) },
+                                    { it.league.name }
+                                )
+                            )
+                    } else {
+                        emptyList()
+                    }
+
+                    // compute which tabs to show:
+                    // Score: only when there are finished matches
+                    // Upcoming: only for today and future dates
                     val hasFinished = matches.any { it.status == MatchStatus.FINISHED }
                     val hasScheduled = matches.any { it.status == MatchStatus.SCHEDULED }
 

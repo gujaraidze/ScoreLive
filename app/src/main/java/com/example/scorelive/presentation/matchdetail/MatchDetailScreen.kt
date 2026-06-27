@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.scorelive.presentation.home.LiveMinutePill
+import com.example.scorelive.presentation.home.liveMinuteLabel
 import com.example.scorelive.domain.model.*
 import com.example.scorelive.presentation.theme.*
 
@@ -311,7 +312,7 @@ fun MatchScoreHeader(match: Match, events: List<MatchEvent> = emptyList()) {
                     )
                 }
                 if (match.status == MatchStatus.LIVE) {
-                    LiveMinutePill(minute = match.minute)
+                    LiveMinutePill(label = liveMinuteLabel(match))
                 }
             }
 

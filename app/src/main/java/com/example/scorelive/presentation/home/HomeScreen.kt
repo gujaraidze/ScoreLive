@@ -452,7 +452,7 @@ fun MatchTeamRow(name: String, logoUrl: String, score: Int?) {
             modifier = Modifier.weight(1f)
         )
         Text(
-            text = score?.toString() ?: "-",
+            text = score?.toString() ?: "",
             color = TextPrimary,
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold
@@ -461,9 +461,19 @@ fun MatchTeamRow(name: String, logoUrl: String, score: Int?) {
 }
 
 // returns (primary status label, optional date/secondary label) for the left column
+// For a live match, shows "HT" at half-time, "PEN" during penalties, "ET" during the
+// pre-extra-time break, and otherwise the running minute ("67'"). Without this, half-time
+// would sit frozen on "45'" because the API keeps elapsed=45 until the second half starts.
+fun liveMinuteLabel(match: Match): String = when (match.statusShort) {
+    "HT" -> "HT"
+    "P" -> "PEN"
+    "BT" -> "ET"
+    else -> match.minute?.let { "$it'" } ?: "LIVE"
+}
+
 private fun matchStatusLines(match: Match): Pair<String, String?> {
     return when (match.status) {
-        MatchStatus.LIVE -> (if (match.minute != null) "${match.minute}'" else "LIVE") to null
+        MatchStatus.LIVE -> liveMinuteLabel(match) to null
         MatchStatus.FINISHED -> "FT" to match.date.substringBefore("T").let {
             val parts = it.split("-")
             if (parts.size == 3) "${parts[2]}/${parts[1]}" else it
@@ -505,7 +515,7 @@ fun LiveMatchCard(match: Match, onClick: () -> Unit) {
                     fontSize = 13.sp
                 )
             }
-            LiveMinutePill(minute = match.minute)
+            LiveMinutePill(label = liveMinuteLabel(match))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -569,7 +579,7 @@ fun LiveTeamColumn(name: String, logoUrl: String, modifier: Modifier = Modifier)
 
 // pale-mint pill with a pulsing green dot + minute count, matches Figma exactly
 @Composable
-fun LiveMinutePill(minute: Int?) {
+fun LiveMinutePill(label: String) {
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(50))
@@ -584,7 +594,7 @@ fun LiveMinutePill(minute: Int?) {
                 .background(color = LiveGreen, shape = androidx.compose.foundation.shape.CircleShape)
         )
         Text(
-            text = minute?.toString() ?: "",
+            text = label,
             color = Color(0xFF0F1729),
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold

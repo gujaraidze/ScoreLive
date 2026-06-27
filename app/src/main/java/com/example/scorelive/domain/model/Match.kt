@@ -9,5 +9,9 @@ data class Match(
     val league: League,
     val status: MatchStatus,
     val minute: Int?,
-    val date: String
+    val date: String,
+    // raw API status code ("HT", "1H", "2H", "P", "BT"...) — kept so the UI can show
+    // half-time/penalties instead of a frozen minute number. Defaults to "" so mock/
+    // placeholder Match() constructions don't need to set it.
+    val statusShort: String = ""
 )
