@@ -138,10 +138,20 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private fun startLivePolling() {
         viewModelScope.launch {
             while (isActive) {
-                delay(30_000L) // 30s — frequent enough for scores, light on the free-plan quota
-                if (_selectedDate.value == LocalDate.now()) {
-                    android.util.Log.d("API_LIMIT", "Live poll — fetching in-play matches")
-                    repository.fetchLiveMatches()
+                delay(60_000L) // 60s — see note below on the quota tradeoff
+                val hasLiveOnScreen =
+                    (_uiState.value as? HomeUiState.Success)?.liveMatches?.isNotEmpty() == true
+                // Re-fetch the WHOLE day, not just live matches. /fixtures?live=all only
+                // returns matches still in play, so a match that just ended drops out of it
+                // and never gets its status updated to FT — that's what leaves it stuck in
+                // the Live Now row. Re-fetching the full day includes the just-finished
+                // match with its FT status, so the upsert flips it to FINISHED and the live
+                // filter drops it. Guarded so it only runs while today is selected AND a live
+                // match is actually showing — once the last one ends, the next poll writes
+                // its FT status, the live list empties, and polling goes idle (no wasted calls).
+                if (_selectedDate.value == LocalDate.now() && hasLiveOnScreen) {
+                    android.util.Log.d("API_LIMIT", "Live poll — refreshing today's fixtures")
+                    repository.fetchMatchesByDate(_selectedDate.value.toString())
                 }
             }
         }

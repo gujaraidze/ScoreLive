@@ -57,27 +57,49 @@ class MatchDetailViewModel(
         if (cached != null && cached.match.id != 0) {
             _uiState.value = MatchDetailUiState.Success(cached)
         }
-        loadInitialData()
+        observeMatch()
+        loadEventsAndLineups()
     }
 
-    private fun loadInitialData() {
+    // Observe the match REACTIVELY (collect, not first()) so the score/status/minute on
+    // the header update live while the user watches, and so re-opening a live match shows
+    // whatever Room currently holds instead of a frozen cached snapshot.
+    private fun observeMatch() {
+        viewModelScope.launch {
+            repository.getMatchByIdFromDb(matchId).collect { match ->
+                if (match == null) {
+                    // only surface "not found" if we have nothing cached to show
+                    if (data.match.id == 0) {
+                        Log.e("MATCH_DETAIL", "Match not found in DB")
+                        _uiState.value = MatchDetailUiState.Error("Match not found")
+                    }
+                    return@collect
+                }
+                val wasEmpty = data.match.id == 0
+                data = data.copy(match = match)
+                _uiState.value = MatchDetailUiState.Success(data)
+                // Once the real match is available for the first time, load data for whatever
+                // tab the user is already on. This fixes the race where tapping H2H/Standings
+                // before the match loaded called the API with id 0 and then never retried.
+                if (wasEmpty) loadCurrentTabData()
+            }
+        }
+    }
+
+    private fun loadCurrentTabData() {
+        when (_selectedTab.value) {
+            MatchDetailTab.STATS -> loadStats()
+            MatchDetailTab.H2H -> loadH2H()
+            MatchDetailTab.STANDINGS -> loadStandings()
+            else -> {}
+        }
+    }
+
+    private fun loadEventsAndLineups() {
         // don't re-fetch events/lineups if already loaded this session
         if (matchId in eventsLoaded) return
 
         viewModelScope.launch {
-            Log.d("MATCH_DETAIL", "Loading matchId: $matchId")
-
-            val match = repository.getMatchByIdFromDb(matchId).first()
-            if (match == null) {
-                Log.e("MATCH_DETAIL", "Match not found in DB")
-                _uiState.value = MatchDetailUiState.Error("Match not found")
-                return@launch
-            }
-
-            Log.d("MATCH_DETAIL", "Match: ${match.homeTeam.name} vs ${match.awayTeam.name}")
-            data = data.copy(match = match)
-            _uiState.value = MatchDetailUiState.Success(data)
-
             eventsLoaded.add(matchId)
 
             // fetch events and lineups in parallel
@@ -132,6 +154,9 @@ class MatchDetailViewModel(
     private fun loadH2H() {
         if (data.h2h.isNotEmpty()) return
         if (matchId in h2hLoaded) return
+        // match not loaded yet — bail without marking loaded, so it retries once the
+        // match arrives (observeMatch re-triggers the current tab via loadCurrentTabData)
+        if (data.match.id == 0) return
         viewModelScope.launch {
             h2hLoaded.add(matchId)
             val match = data.match
@@ -152,6 +177,7 @@ class MatchDetailViewModel(
     private fun loadStandings() {
         if (data.standings.isNotEmpty()) return
         if (matchId in standingsLoaded) return
+        if (data.match.id == 0) return
         viewModelScope.launch {
             standingsLoaded.add(matchId)
             val leagueId = data.match.league.id
@@ -195,7 +221,10 @@ class MatchDetailViewModel(
         standingsLoaded.remove(matchId)
         cache.remove(matchId)
         _uiState.value = MatchDetailUiState.Loading
-        loadInitialData()
+        // observeMatch() is already collecting and will re-emit the match; re-fetch the
+        // detail data that the cache clear just invalidated.
+        loadEventsAndLineups()
+        loadCurrentTabData()
     }
 
     companion object {
