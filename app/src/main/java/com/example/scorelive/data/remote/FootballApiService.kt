@@ -13,11 +13,6 @@ import retrofit2.http.Query
 interface FootballApiService {
 
     @GET("fixtures")
-    suspend fun getLiveFixtures(
-        @Query("live") live: String = "all"
-    ): FixturesResponseDto
-
-    @GET("fixtures")
     suspend fun getFixturesByDate(
         @Query("date") date: String
     ): FixturesResponseDto

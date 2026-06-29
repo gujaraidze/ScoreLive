@@ -124,7 +124,6 @@ class MockRepository : FootballRepository {
 
     // --- API fetches (all instant, no network) ---
 
-    override suspend fun fetchLiveMatches() = NetworkResult.Success(Unit)
     override suspend fun fetchMatchesByDate(date: String) = NetworkResult.Success(Unit)
 
     override suspend fun fetchMatchEvents(matchId: Int) = NetworkResult.Success(

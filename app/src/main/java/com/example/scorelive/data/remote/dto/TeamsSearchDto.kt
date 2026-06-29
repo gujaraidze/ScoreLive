@@ -19,9 +19,9 @@ data class TeamSearchInfoDto(
     @SerializedName("id")
     val id: Int,
     @SerializedName("name")
-    val name: String,
+    val name: String?,
     @SerializedName("logo")
-    val logo: String,
+    val logo: String?,
     @SerializedName("country")
     val country: String?
 )
@@ -36,7 +36,7 @@ data class VenueDto(
 fun TeamSearchItemDto.toTeam(): Team {
     return Team(
         id = team.id,
-        name = team.name,
-        logoUrl = team.logo
+        name = team.name ?: "",
+        logoUrl = team.logo ?: ""
     )
 }

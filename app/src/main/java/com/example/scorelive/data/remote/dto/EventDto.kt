@@ -20,9 +20,9 @@ data class EventItemDto(
     @SerializedName("assist")
     val assist: EventPlayerDto?,
     @SerializedName("type")
-    val type: String,
+    val type: String?,
     @SerializedName("detail")
-    val detail: String
+    val detail: String?
 )
 
 data class EventTimeDto(
@@ -41,16 +41,17 @@ data class EventPlayerDto(
 
 // EventItemDto → MatchEvent
 fun EventItemDto.toMatchEvent(): MatchEvent {
+    val safeDetail = detail ?: ""
     return MatchEvent(
         minute = time.elapsed,
         team = Team(
             id = team.id,
-            name = team.name,
-            logoUrl = team.logo
+            name = team.name ?: "",
+            logoUrl = team.logo ?: ""
         ),
         playerName = player.name ?: "",
         assistName = assist?.name,
-        type = EventType.fromString(type, detail),
-        detail = detail
+        type = EventType.fromString(type ?: "", safeDetail),
+        detail = safeDetail
     )
 }

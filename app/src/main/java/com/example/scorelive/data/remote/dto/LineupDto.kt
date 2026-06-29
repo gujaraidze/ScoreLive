@@ -57,8 +57,8 @@ fun LineupItemDto.toLineup(): Lineup {
     return Lineup(
         team = Team(
             id = team.id,
-            name = team.name,
-            logoUrl = team.logo
+            name = team.name ?: "",
+            logoUrl = team.logo ?: ""
         ),
         formation = formation ?: "Unknown",
         coachName = coach?.name,

@@ -22,7 +22,7 @@ data class TeamStatisticsDto(
 
 data class StatItemDto(
     @SerializedName("type")
-    val type: String,
+    val type: String?,
     @SerializedName("value")
     val value: Any? // API returns int, string, or null
 )
@@ -31,12 +31,12 @@ fun TeamStatisticsDto.toFixtureStat(): FixtureStat {
     return FixtureStat(
         team = Team(
             id = team.id,
-            name = team.name,
-            logoUrl = team.logo
+            name = team.name ?: "",
+            logoUrl = team.logo ?: ""
         ),
         statistics = statistics.map {
             StatItem(
-                type = it.type,
+                type = it.type ?: "",
                 value = it.value?.toString() ?: "0"
             )
         }
@@ -104,8 +104,8 @@ fun StandingItemDto.toStanding(): Standing {
         rank = rank,
         team = Team(
             id = team.id,
-            name = team.name,
-            logoUrl = team.logo
+            name = team.name ?: "",
+            logoUrl = team.logo ?: ""
         ),
         played = all.played,
         won = all.win,

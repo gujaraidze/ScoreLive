@@ -125,16 +125,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         startLivePolling()
     }
 
-    // Re-fetches in-play matches on a timer so live scores tick up while the user
-    // watches, without them having to leave and re-open the screen. The TTL gate in
-    // fetchMatchesForDate only *prevents* redundant calls — it never triggers a refresh
-    // on its own. This loop is what actually pushes new data into Room, after which the
-    // existing Room Flow carries the update to the UI automatically.
-    //
-    // fetchLiveMatches() hits /fixtures?live=all (one API call) and upserts only the
-    // matches currently in play. We only poll while today is the selected date, since
-    // past/future dates have no live matches and polling them would waste API quota.
-    // viewModelScope cancels this loop automatically when the ViewModel is cleared.
+    // Re-fetches today's fixtures on a timer so live scores tick up while the user
+    // watches, and — crucially — so matches that have ENDED drop out of the Live Now
+    // row. The TTL gate in fetchMatchesForDate only *prevents* redundant calls; this
+    // loop is what actually pushes new data into Room, after which the existing Room
+    // Flow carries the update to the UI automatically.
     private fun startLivePolling() {
         viewModelScope.launch {
             while (isActive) {

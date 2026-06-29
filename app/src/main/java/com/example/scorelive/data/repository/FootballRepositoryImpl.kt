@@ -45,11 +45,6 @@ class FootballRepositoryImpl(
         matchDao.getMatchesByDate(date).map { it.map { e -> e.toMatch() } }
 
     // fixture fetches — save to Room, return Unit
-    override suspend fun fetchLiveMatches() =
-        makeApiCall { apiService.getLiveFixtures() }.mapSuccess {
-            matchDao.upsertAll(it.response.map { item -> item.toEntity() })
-        }
-
     override suspend fun fetchMatchesByDate(date: String) =
         makeApiCall { apiService.getFixturesByDate(date) }.mapSuccess {
             matchDao.upsertAll(it.response.map { item -> item.toEntity() })

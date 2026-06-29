@@ -29,9 +29,9 @@ data class FixtureInfoDto(
 
 data class FixtureStatusDto(
     @SerializedName("long")
-    val long: String,
+    val long: String?,
     @SerializedName("short")
-    val short: String,
+    val short: String?,
     @SerializedName("elapsed")
     val elapsed: Int?
 )
@@ -40,11 +40,11 @@ data class LeagueDto(
     @SerializedName("id")
     val id: Int,
     @SerializedName("name")
-    val name: String,
+    val name: String?,
     @SerializedName("logo")
-    val logo: String,
+    val logo: String?,
     @SerializedName("country")
-    val country: String,
+    val country: String?,
     @SerializedName("season")
     val season: Int? = null
 )
@@ -60,9 +60,9 @@ data class TeamDto(
     @SerializedName("id")
     val id: Int,
     @SerializedName("name")
-    val name: String,
+    val name: String?,
     @SerializedName("logo")
-    val logo: String
+    val logo: String?
 )
 
 data class GoalsDto(

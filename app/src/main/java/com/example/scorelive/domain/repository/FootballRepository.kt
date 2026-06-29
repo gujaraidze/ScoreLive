@@ -15,7 +15,6 @@ interface FootballRepository {
     fun getMatchesByDateFromDb(date: String): Flow<List<Match>>
 
     // API → Room
-    suspend fun fetchLiveMatches(): NetworkResult<Unit>
     suspend fun fetchMatchesByDate(date: String): NetworkResult<Unit>
 
     // match detail (not cached)
