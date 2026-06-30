@@ -141,30 +141,33 @@ fun MatchDetailScreen(
                     }
                 }
 
-                // tab content
-                when (selectedTab) {
-                    MatchDetailTab.SUMMARY -> SummaryTab(
-                        events = state.matchDetail.events,
-                        match = match
-                    )
-                    MatchDetailTab.LINEUP -> LineupTab(
-                        lineups = state.matchDetail.lineups,
-                        match = match
-                    )
-                    MatchDetailTab.STATS -> StatsTab(
-                        statistics = state.matchDetail.statistics,
-                        match = match
-                    )
-                    MatchDetailTab.H2H -> H2HTab(
-                        matches = state.matchDetail.h2h,
-                        homeTeam = match.homeTeam,
-                        awayTeam = match.awayTeam
-                    )
-                    MatchDetailTab.STANDINGS -> StandingsTab(
-                        standings = state.matchDetail.standings,
-                        homeTeamId = match.homeTeam.id,
-                        awayTeamId = match.awayTeam.id
-                    )
+                // tab content — weight(1f) gives it all the remaining space and it scrolls
+                // internally, so a tall score header can't squeeze it (or the tabs) off-screen
+                Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                    when (selectedTab) {
+                        MatchDetailTab.SUMMARY -> SummaryTab(
+                            events = state.matchDetail.events,
+                            match = match
+                        )
+                        MatchDetailTab.LINEUP -> LineupTab(
+                            lineups = state.matchDetail.lineups,
+                            match = match
+                        )
+                        MatchDetailTab.STATS -> StatsTab(
+                            statistics = state.matchDetail.statistics,
+                            match = match
+                        )
+                        MatchDetailTab.H2H -> H2HTab(
+                            matches = state.matchDetail.h2h,
+                            homeTeam = match.homeTeam,
+                            awayTeam = match.awayTeam
+                        )
+                        MatchDetailTab.STANDINGS -> StandingsTab(
+                            standings = state.matchDetail.standings,
+                            homeTeamId = match.homeTeam.id,
+                            awayTeamId = match.awayTeam.id
+                        )
+                    }
                 }
             }
         }
@@ -380,22 +383,67 @@ fun MatchScoreHeader(match: Match, events: List<MatchEvent> = emptyList()) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Divider(color = DividerColor, thickness = 1.dp)
                 Spacer(modifier = Modifier.height(12.dp))
+
+                // split by team so each side's scorers sit under its own crest.
+                // goalCountsForHomeTeam handles own goals (they count for the other team).
+                val homeScorers = scorers.filter { goalCountsForHomeTeam(it, match) }
+                val awayScorers = scorers.filter { !goalCountsForHomeTeam(it, match) }
+                // safety cap so a freak scoreline can't make the header grow without bound
+                val maxPerSide = 8
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    verticalAlignment = Alignment.Top
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.SportsSoccer,
-                        contentDescription = "Goals",
-                        tint = TextSecondary,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Column(horizontalAlignment = Alignment.End) {
-                        scorers.forEach { event ->
+                    // home scorers — left
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        homeScorers.take(maxPerSide).forEach { event ->
                             Text(
                                 text = "${event.playerName} ${event.minute}'",
                                 color = TextSecondary,
                                 fontSize = 12.sp
+                            )
+                        }
+                        if (homeScorers.size > maxPerSide) {
+                            Text(
+                                text = "+${homeScorers.size - maxPerSide} more",
+                                color = TextSecondary,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+
+                    Icon(
+                        imageVector = Icons.Default.SportsSoccer,
+                        contentDescription = "Goals",
+                        tint = TextSecondary,
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .size(18.dp)
+                    )
+
+                    // away scorers — right
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        awayScorers.take(maxPerSide).forEach { event ->
+                            Text(
+                                text = "${event.minute}' ${event.playerName}",
+                                color = TextSecondary,
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.End
+                            )
+                        }
+                        if (awayScorers.size > maxPerSide) {
+                            Text(
+                                text = "+${awayScorers.size - maxPerSide} more",
+                                color = TextSecondary,
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.End
                             )
                         }
                     }
