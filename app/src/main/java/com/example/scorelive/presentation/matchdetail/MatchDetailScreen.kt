@@ -3,7 +3,6 @@ package com.example.scorelive.presentation.matchdetail
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -141,7 +140,7 @@ fun MatchDetailScreen(
                     }
                 }
 
-                // tab content — weight(1f) gives it all the remaining space and it scrolls
+                // tab content — weight(1f) gives it all the remaining space, and it scrolls
                 // internally, so a tall score header can't squeeze it (or the tabs) off-screen
                 Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
                     when (selectedTab) {
@@ -224,7 +223,7 @@ fun TopBar(
                 tint = TextPrimary
             )
         }
-        // star icon — filled if favorited, outline if not
+        // star icon — filled if favorite, outline if not
         IconButton(onClick = onFavoriteClicked) {
             Icon(
                 imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
@@ -375,7 +374,7 @@ fun MatchScoreHeader(match: Match, events: List<MatchEvent> = emptyList()) {
                 }
             }
 
-            // goal-scorers footer — only shown once the match has kicked off and has goals
+            // goalscorers footer — only shown once the match has kicked off and has goals
             val scorers = events.filter {
                 it.type == EventType.GOAL || it.type == EventType.OWN_GOAL || it.type == EventType.PENALTY
             }
@@ -823,7 +822,7 @@ fun PitchRow(players: List<Player>, badgeColor: Color, numberColor: Color) {
 }
 
 // keeps only the first and last name segments, dropping any middle names —
-// e.g. "Bruno Miguel Borges Fernandes" -> "Bruno Fernandes",
+// e.g. "Bruno Miguel Borges Fernandez" -> "Bruno Fernandes",
 // while names that are already just two parts (or one) pass through unchanged
 private fun shortDisplayName(fullName: String): String {
     val parts = fullName.trim().split(" ").filter { it.isNotBlank() }
@@ -1381,7 +1380,7 @@ internal fun classifyZone(description: String?): StandingZone? {
     val text = description.lowercase()
     return when {
         "champions league" in text -> StandingZone.CHAMPIONS_LEAGUE
-        "europa league" in text -> StandingZone.EUROPA_LEAGUE
+        "Europa league" in text -> StandingZone.EUROPA_LEAGUE
         "conference league" in text -> StandingZone.CONFERENCE_LEAGUE
         "relegation" in text -> StandingZone.RELEGATION
         else -> null
