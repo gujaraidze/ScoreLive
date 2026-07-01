@@ -201,7 +201,7 @@ fun HomeScreen(
                         }
                     }
 
-                    // Upcoming / Score / Favorites — only show tabs that have matches
+                    // Upcoming / Score — only show tabs that have matches
                     if (state.availableTabs.isNotEmpty()) {
                         item(key = "home_tabs") {
                             HomeTabRow(
@@ -483,7 +483,7 @@ private fun matchStatusLines(match: Match): Pair<String, String?> {
     }
 }
 
-// Live Now horizontal carousel card — bigger, with league header + Details button
+// Live Now horizontal carousel card
 @Composable
 fun LiveMatchCard(match: Match, onClick: () -> Unit) {
     Column(
